@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CRIC-C PRO</title>
+    <style>
+        /* OFFLINE PREMIER EDITION - NO EXTERNAL LINKS */
+        :root {
+            --bg-color: #020205;
+            --header-bg: rgba(10, 15, 30, 0.9);
+            --card-bg: rgba(15, 20, 40, 0.95);
+            --border-color: #1a2a40;
+            --text-primary: #ffffff;
+            --text-secondary: #8e9db0;
+            --btn-bg: rgba(25, 35, 60, 0.8);
+            --btn-border: #2d4059;
+            --cyan: #00e5ff;
+            --rose: #ff2d55;
+            --emerald: #00ff88;
+            --amber: #ffcc00;
+            --shadow-glow: rgba(0, 229, 255, 0.3);
+            --overlay-bg: rgba(0, 0, 0, 0.95);
+            --log-bg: #000000;
+            --log-text: #00ff88;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f4f8;
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #d1d9e6;
+            --text-primary: #000000;
+            --text-secondary: #455a64;
+            --btn-bg: #e1e8ef;
+            --btn-border: #b0bec5;
+            --cyan: #00838f;
+            --rose: #c2185b;
+            --emerald: #2e7d32;
+            --amber: #f57f17;
+            --shadow-glow: rgba(0, 0, 0, 0.1);
+            --overlay-bg: rgba(255, 255, 255, 0.95);
+            --log-bg: #ffffff;
+            --log-text: #1b5e20;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(at 50% -20%, rgba(0, 229, 255, 0.1), transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(255, 45, 85, 0.05), transparent 50%);
+            padding: 12px;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px; background: var(--header-bg); border: 1px solid var(--border-color);
+            border-radius: 18px; padding: 0 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+
+        main { display: grid; grid-template-columns: 2fr 1.2fr; gap: 12px; margin: 12px 0; height: 26%; }
+
+        .matrix-box {
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 14px; background: var(--card-bg); border-radius: 22px;
+            border: 1px solid var(--border-color); box-shadow: 0 0 25px var(--shadow-glow);
+        }
+
+        .score-display { display: flex; align-items: baseline; gap: 8px; margin: auto 0; }
+        .runs { font-size: 60px; font-weight: 900; line-height: 1; color: var(--text-primary); transition: color 0.3s; }
+        .divider { font-size: 30px; color: var(--text-secondary); opacity: 0.6; }
+        .wickets { font-size: 45px; font-weight: 900; color: var(--rose); line-height: 1; }
+
+        .stats-row {
+            display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px;
+            border-top: 1px solid var(--border-color); padding-top: 8px;
+            font-size: 10px; font-weight: 800; font-family: ui-monospace, monospace;
+        }
+
+        .info-panel {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 22px; text-align: center; padding: 12px;
+        }
+
+        section.log-container {
+            height: 18%; background: var(--log-bg); border: 1px solid var(--border-color);
+            border-radius: 20px; padding: 12px; display: flex; flex-direction: column; overflow: hidden;
+            transition: background-color 0.3s;
+        }
+
+        #terminal-log { flex: 1; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 15px; color: var(--log-text); padding-top: 6px; font-weight: 700; transition: color 0.3s; }
+
+        footer { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; height: 42%; }
+
+        button.control-btn {
+            background: var(--btn-bg); border: 1px solid var(--btn-border);
+            border-radius: 20px; color: var(--text-primary);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.1s, background-color 0.2s, color 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        button.control-btn:active { transform: scale(0.9); background: var(--cyan); color: #000; }
+
+        .btn-val { font-size: 40px; font-weight: 900; line-height: 1; }
+        .btn-label { font-size: 11px; font-weight: 900; text-transform: uppercase; opacity: 0.8; margin-top: 4px; }
+
+        #theme-toggle {
+            background: var(--btn-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; width: 42px; height: 42px; font-size: 20px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+
+        #winner-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--overlay-bg); display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000; text-align: center; transition: background-color 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .poster {
+            width: 90%; padding: 50px 20px; border: 6px solid var(--cyan); border-radius: 40px;
+            background: var(--card-bg); box-shadow: 0 0 100px var(--shadow-glow);
+            animation: winnerPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--text-primary);
+        }
+        @keyframes winnerPop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .congrats-text { font-size: 44px; font-weight: 900; margin-bottom: 10px; text-shadow: 0 0 20px var(--cyan); }
+        .won-text { font-size: 28px; font-weight: 900; color: var(--cyan); text-transform: uppercase; letter-spacing: 2px; }
+
+        .scanlines { position: relative; }
+        .scanlines::after {
+            content: ""; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px; pointer-events: none;
+        }
+
+        .overs-input {
+            background: transparent; border: 1px solid var(--cyan); border-radius: 6px;
+            color: var(--cyan); width: 45px; text-align: center; font-weight: 900;
+            padding: 2px; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="winner-overlay" onclick="closeWinner()">
+        <div class="poster">
+            <div style="font-size: 100px; margin-bottom: 25px;">🏆</div>
+            <h2 class="congrats-text">CONGRATULATIONS! 🎉</h2>
+            <p class="won-text">MATCH WON BY CHASING TEAM</p>
+            <p style="color: var(--text-secondary); margin-top: 50px; font-weight: bold; font-size: 16px;">TAP TO DISMISS</p>
+        </div>
+    </div>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="logo-container" style="width: 42px; height: 42px; border-radius: 10px; background: #000; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border-color); overflow: hidden;">
+                <img id="logo-img" src="logo.png" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo" onerror="handleLogoError()">
+                <div id="logo-fallback" style="display:none; width: 100%; height: 100%; align-items: center; justify-content: center; background: #000;">
+                    <svg style="width: 30px; height: 30px;" viewBox="0 0 100 100"><path d="M15 15 L35 15 L75 85 L55 85 Z" fill="#00e5ff"/><circle cx="75" cy="25" r="12" fill="#ff2d55" /></svg>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+                <h1 style="font-size: 18px; font-weight: 900; letter-spacing: 1px; color: var(--cyan); line-height: 1;">CRIC-C</h1>
+                <div style="display: flex; align-items: center; gap: 5px; margin-top: 2px;">
+                    <span style="font-size: 9px; font-weight: 900; color: var(--text-secondary);">OVERS:</span>
+                    <input type="number" id="total-overs-input" class="overs-input" value="20" onchange="setTotalOvers(this.value)">
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div id="theme-toggle" onclick="toggleTheme()">🌙</div>
+            <div id="innings-box" style="padding: 6px 12px; background: #0a1020; border: 1px solid #1e293b; color: var(--cyan); font-size: 14px; font-weight: 900; border-radius: 10px;">INNING - 1</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="matrix-box">
+            <div style="font-size: 11px; font-weight: 900; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Live Matrix</div>
+            <div class="score-display">
+                <span id="display-score" class="runs">0</span>
+                <span class="divider">/</span>
+                <span id="display-wickets" class="wickets">0</span>
+            </div>
+            <div class="stats-row">
+                <div>OVERS: <span id="display-overs" style="color: var(--cyan);">0.0</span></div>
+                <div>CRR: <span id="display-cr" style="color: var(--emerald);">0.00</span></div>
+                <div>REM: <span id="display-rem-overs" style="color: var(--amber);">20.0</span></div>
+                <div>BALLS: <span id="display-rem-balls-main" style="color: var(--rose);">120</span></div>
+            </div>
+        </div>
+
+        <div id="switch-panel" class="info-panel">
+            <!-- FIXED: Added missing ID 'inn-label' to prevent script crash -->
+            <div id="inn-label" style="display:none;"></div>
+
+            <div id="switch-default" style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-size: 10px; font-weight: 900; color: var(--text-secondary);">REMAINING</div>
+                <div id="rem-balls-inn1" style="font-size: 28px; font-weight: 900; color: var(--amber);">120</div>
+                <div style="font-size: 11px; font-weight: 900; color: var(--text-primary); text-transform: uppercase; opacity: 0.8;">Balls</div>
+            </div>
+
+            <div id="switch-active" style="display: none; flex-direction: column; justify-content: space-between; height: 100%; width: 100%;">
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <div><div class="btn-label" style="font-size: 9px;">Target</div><div id="target-display" style="color: #fbbf24; font-size: 18px; font-weight: 900;">0</div></div>
+                    <div><div class="btn-label" style="font-size: 9px;">Need</div><div id="display-rem-runs" style="font-size: 18px; font-weight: 900;">0</div></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <div><div class="btn-label" style="font-size: 9px;">Balls</div><div id="display-rem-balls-inn2" style="font-size: 18px; color: var(--rose); font-weight: 900;">0</div></div>
+                    <div><div class="btn-label" style="font-size: 9px;">RRR</div><div id="display-rrr" style="color: var(--emerald); font-size: 18px; font-weight: 900;">0.00</div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="log-container scanlines">
+        <div id="terminal-log">
+            <div style="color: var(--text-secondary); font-weight: normal; font-size: 14px; text-align: center; margin-top: 15px;">&gt; Waiting for first ball...</div>
+        </div>
+    </section>
+
+    <footer>
+        <button class="control-btn" onclick="addRuns(0)"><span class="btn-val">0</span><span class="btn-label">Dot Ball</span></button>
+        <button class="control-btn" onclick="addRuns(1)"><span class="btn-val">1</span><span class="btn-label">Run</span></button>
+        <button class="control-btn" onclick="addRuns(2)"><span class="btn-val">2</span><span class="btn-label">Runs</span></button>
+        <button class="control-btn" onclick="addRuns(3)"><span class="btn-val">3</span><span class="btn-label">Runs</span></button>
+        <button class="control-btn" onclick="addRuns(4)" style="color: var(--emerald); border-color: var(--emerald);"><span class="btn-val">4</span><span class="btn-label">Bound</span></button>
+        <button class="control-btn" onclick="addRuns(6)" style="color: var(--cyan); border-color: var(--cyan);"><span class="btn-val">6</span><span class="btn-label">Max</span></button>
+        <button class="control-btn" onclick="addWicket()" style="color: var(--rose); border-color: var(--rose);"><span class="btn-val">W</span><span class="btn-label">Wicket</span></button>
+        <button class="control-btn" onclick="undo()" style="color: var(--amber);"><span class="btn-val" style="font-size: 24px;">UNDO</span><span class="btn-label">Revoke</span></button>
+        <button class="control-btn" onclick="addExtra('WD')" style="color: #818cf8;"><span class="btn-val" style="font-size: 28px;">WD</span><span class="btn-label">Wide</span></button>
+        <button class="control-btn" onclick="addExtra('NB')" style="color: #a78bfa;"><span class="btn-val" style="font-size: 28px;">NB</span><span class="btn-label">No Ball</span></button>
+        <button class="control-btn" onclick="toggleInningsSwitch()" id="switch-btn" style="color: var(--cyan);"><span class="btn-val" style="font-size: 16px;">SWAP</span><span class="btn-label">INN</span></button>
+        <button class="control-btn" onclick="resetSystem()"><span class="btn-val" style="font-size: 16px; color: var(--text-secondary);">RESET</span><span class="btn-label" style="color: var(--rose);">Flush</span></button>
+    </footer>
+
+    <script>
+        let totalOvers = 20;
+        let totalBalls = 120;
+        let inningsData = {
+            1: { score: 0, wickets: 0, balls: 0, oversLog: [[]], history: [] },
+            2: { score: 0, wickets: 0, balls: 0, oversLog: [[]], history: [] }
+        };
+        let currentActiveInnings = 1;
+        let autoCalculatedTarget = 0;
+        let isWinnerShown = false;
+
+        // ---- Persistence: survive the app being backgrounded / killed ----
+        const STORAGE_KEY = 'cricc_match_v1';
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    totalOvers, totalBalls, inningsData, currentActiveInnings,
+                    autoCalculatedTarget, isWinnerShown,
+                    theme: document.body.getAttribute('data-theme') || ''
+                }));
+            } catch (e) { /* storage unavailable — degrade silently */ }
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return false;
+                const s = JSON.parse(raw);
+                totalOvers = s.totalOvers; totalBalls = s.totalBalls;
+                inningsData = s.inningsData; currentActiveInnings = s.currentActiveInnings;
+                autoCalculatedTarget = s.autoCalculatedTarget; isWinnerShown = s.isWinnerShown;
+                const oversInput = document.getElementById('total-overs-input');
+                if (oversInput) oversInput.value = totalOvers;
+                if (s.theme === 'light') {
+                    document.body.setAttribute('data-theme', 'light');
+                    const btn = document.getElementById('theme-toggle');
+                    if (btn) btn.innerText = '☀️';
+                }
+                return true;
+            } catch (e) { return false; }
+        }
+
+        function setTotalOvers(val) {
+            let ov = parseInt(val);
+            if (isNaN(ov) || ov <= 0) ov = 20;
+            totalOvers = ov;
+            totalBalls = ov * 6;
+            updateDisplayDashboard();
+        }
+
+        function handleLogoError() {
+            const img = document.getElementById('logo-img');
+            const fallback = document.getElementById('logo-fallback');
+            if(img) img.style.display = 'none';
+            if(fallback) fallback.style.display = 'flex';
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('theme-toggle');
+            if (body.hasAttribute('data-theme')) {
+                body.removeAttribute('data-theme');
+                btn.innerText = '🌙';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.innerText = '☀️';
+            }
+            saveState();
+        }
+
+        function saveHistory() {
+            let active = inningsData[currentActiveInnings];
+            active.history.push(JSON.stringify({
+                score: active.score, wickets: active.wickets, balls: active.balls,
+                oversLog: active.oversLog.map(over => [...over])
+            }));
+        }
+
+        function updateDisplayDashboard() {
+            try {
+                let active = inningsData[currentActiveInnings];
+                const completedOvers = Math.floor(active.balls / 6);
+                const activeOverBalls = active.balls % 6;
+                const oversDisplayString = `${completedOvers}.${activeOverBalls}`;
+
+                const remBalls = Math.max(0, totalBalls - active.balls);
+                const remOversCompleted = Math.floor(remBalls / 6);
+                const remOversBalls = remBalls % 6;
+                const remOversString = `${remOversCompleted}.${remOversBalls}`;
+
+                const preciseOversValue = completedOvers + (activeOverBalls / 6);
+                const currentRunRate = preciseOversValue > 0 ? (active.score / preciseOversValue).toFixed(2) : "0.00";
+
+                document.getElementById('display-score').innerText = active.score;
+                document.getElementById('display-wickets').innerText = active.wickets;
+                document.getElementById('display-overs').innerText = oversDisplayString;
+                document.getElementById('display-cr').innerText = currentRunRate;
+                document.getElementById('display-rem-overs').innerText = remOversString;
+                document.getElementById('display-rem-balls-main').innerText = remBalls;
+                document.getElementById('innings-box').innerText = "INNING - " + currentActiveInnings;
+
+                if (currentActiveInnings === 2) {
+                    document.getElementById('switch-default').style.display = 'none';
+                    document.getElementById('switch-active').style.display = 'flex';
+                    document.getElementById('target-display').innerText = autoCalculatedTarget;
+
+                    const runsRequired = autoCalculatedTarget - active.score;
+                    document.getElementById('display-rem-runs').innerText = Math.max(0, runsRequired);
+                    document.getElementById('display-rem-balls-inn2').innerText = remBalls;
+
+                    const remainingOversVal = remBalls / 6;
+
+                    if (active.score >= autoCalculatedTarget) {
+                        document.getElementById('display-rrr').innerText = "WON";
+                        if (!isWinnerShown) { showWinner(); }
+                    } else if (active.wickets >= 10 || remBalls <= 0) {
+                        // target = 1st innings score + 1, so score == target-1 is a tie
+                        document.getElementById('display-rrr').innerText =
+                            (active.score === autoCalculatedTarget - 1) ? "TIE" : "LOST";
+                    } else if (remainingOversVal > 0) {
+                        document.getElementById('display-rrr').innerText = (runsRequired / remainingOversVal).toFixed(2);
+                    } else {
+                        document.getElementById('display-rrr').innerText = "0.00";
+                    }
+                } else {
+                    document.getElementById('switch-active').style.display = 'none';
+                    document.getElementById('switch-default').style.display = 'flex';
+                    document.getElementById('rem-balls-inn1').innerText = remBalls;
+                    if(document.getElementById('inn-label')) {
+                        document.getElementById('inn-label').innerText = "INNING - 1";
+                    }
+                }
+                renderTerminalView();
+                saveState();
+            } catch (e) {
+                console.error("Dashboard Update Error:", e);
+            }
+        }
+
+        function showWinner() {
+            document.getElementById('winner-overlay').style.display = 'flex';
+            isWinnerShown = true;
+        }
+
+        function closeWinner() {
+            document.getElementById('winner-overlay').style.display = 'none';
+        }
+
+        function renderTerminalView() {
+            try {
+                let active = inningsData[currentActiveInnings];
+                const logEl = document.getElementById('terminal-log');
+
+                if (!active.oversLog || (active.oversLog.length === 1 && active.oversLog[0].length === 0)) {
+                    logEl.innerHTML = `<div style="color: var(--text-secondary); font-weight: normal; font-size: 14px; text-align: center; margin-top: 15px;">&gt; INNING - ${currentActiveInnings} | Ready (${totalOvers} Overs)</div>`;
+                    return;
+                }
+
+                let logHtml = `<div style="color:var(--cyan); font-size:10px; margin-bottom:8px; border-bottom:1px solid var(--border-color); padding-bottom:4px; font-weight:900;">LIVE BALL LOG (INN-${currentActiveInnings})</div>`;
+
+                active.oversLog.forEach((over, index) => {
+                    if (over.length > 0 || index === active.oversLog.length - 1) {
+                        const isCurrent = (index === active.oversLog.length - 1);
+                        logHtml += `<div style="padding: 8px 0; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; align-items: center;">
+                            <span style="color: var(--amber); font-weight: 900; min-width: 90px; font-size: 14px;">OVER - ${index + 1}</span>
+                            <span style="letter-spacing: 5px; margin-left: 10px; font-weight: 900; color: var(--text-primary); flex: 1; font-size: 16px;">${over.join('  ') || '...'}</span>
+                            <span style="font-size: 9px; font-weight: 900; color: ${isCurrent ? 'var(--emerald)' : 'var(--text-secondary)'}; opacity: 0.8;">${isCurrent ? 'ACTIVE' : 'DONE'}</span>
+                        </div>`;
+                    }
+                });
+
+                logEl.innerHTML = logHtml;
+                logEl.scrollTop = logEl.scrollHeight;
+            } catch (e) {
+                console.error("Terminal Render Error:", e);
+            }
+        }
+
+        function addRuns(amount) {
+            let active = inningsData[currentActiveInnings];
+            if (active.wickets >= 10 || active.balls >= totalBalls) return;
+            if (currentActiveInnings === 2 && active.score >= autoCalculatedTarget) return;
+
+            saveHistory();
+            active.score += amount;
+            active.oversLog[active.oversLog.length - 1].push(amount);
+            active.balls++;
+            if (active.balls % 6 === 0 && active.balls < totalBalls) active.oversLog.push([]);
+            updateDisplayDashboard();
+        }
+
+        function addExtra(type) {
+            let active = inningsData[currentActiveInnings];
+            if (active.wickets >= 10 || active.balls >= totalBalls) return;
+            if (currentActiveInnings === 2 && active.score >= autoCalculatedTarget) return;
+
+            saveHistory();
+            active.score += 1;
+            active.oversLog[active.oversLog.length - 1].push(type);
+            updateDisplayDashboard();
+        }
+
+        function addWicket() {
+            let active = inningsData[currentActiveInnings];
+            if (active.wickets >= 10 || active.balls >= totalBalls) return;
+            if (currentActiveInnings === 2 && active.score >= autoCalculatedTarget) return;
+
+            saveHistory();
+            active.wickets++;
+            active.oversLog[active.oversLog.length - 1].push('W');
+            active.balls++;
+            if (active.balls % 6 === 0 && active.balls < totalBalls) active.oversLog.push([]);
+            updateDisplayDashboard();
+        }
+
+        function undo() {
+            let active = inningsData[currentActiveInnings];
+            if (active.history.length === 0) return;
+            let state = JSON.parse(active.history.pop());
+            active.score = state.score; active.wickets = state.wickets;
+            active.balls = state.balls; active.oversLog = state.oversLog;
+            isWinnerShown = false;
+            closeWinner();
+            updateDisplayDashboard();
+        }
+
+        function toggleInningsSwitch() {
+            if (currentActiveInnings === 1) {
+                if (confirm("Switch to Inning 2? Target will be " + (inningsData[1].score + 1) + " in " + totalOvers + " Overs.")) {
+                    autoCalculatedTarget = inningsData[1].score + 1;
+                    currentActiveInnings = 2;
+                    isWinnerShown = false;
+                    updateDisplayDashboard();
+                }
+            } else {
+                if (confirm("Switch back to Inning 1?")) {
+                    currentActiveInnings = 1;
+                    updateDisplayDashboard();
+                }
+            }
+        }
+
+        function resetSystem() {
+            if (confirm("Are you sure you want to FLUSH all match data and start over?")) {
+                inningsData = {
+                    1: { score: 0, wickets: 0, balls: 0, oversLog: [[]], history: [] },
+                    2: { score: 0, wickets: 0, balls: 0, oversLog: [[]], history: [] }
+                };
+                currentActiveInnings = 1;
+                autoCalculatedTarget = 0;
+                isWinnerShown = false;
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+                updateDisplayDashboard();
+            }
+        }
+
+        // Restore any in-progress match before first render
+        loadState();
+        updateDisplayDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Android / Gradle
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+/app/build
+# Keep the wrapper jar committed so ./gradlew works out of the box:
+!gradle/wrapper/gradle-wrapper.jar
+
+# Built artifacts belong in Releases, not git history:
+*.apk
+*.aab
+*.ap_
+*.dex
